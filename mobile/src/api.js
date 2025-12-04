@@ -2,7 +2,6 @@ import axios from "axios";
 import { Platform } from "react-native";
 import Constants from "expo-constants";
 
-// Pull values from app.json (expo.extra)
 const {
   WEB_API_URL,
   IOS_API_URL,
@@ -23,10 +22,20 @@ export const api = axios.create({
   baseURL,
 });
 
-// ✅ All requests will now hit /api/auth/... correctly
 api.interceptors.request.use((config) => {
   if (global.authToken) {
     config.headers.Authorization = `Bearer ${global.authToken}`;
   }
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 400) {
+      // Validation error from backend
+      console.error("Validation Error:", error.response.data.message);
+    }
+    return Promise.reject(error);
+  }
+);
