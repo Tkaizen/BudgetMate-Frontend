@@ -20,7 +20,7 @@ const TransactionCard = ({ item }) => {
             <View style={styles.transactionInfo}>
                 <Text style={styles.transactionTitle}>{item.category}</Text>
                 <Text style={styles.transactionDate}>
-                    {new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    {new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • {new Date(item.date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
                 </Text>
             </View>
             <Text style={styles.transactionAmount}>-₱{item.amount.toLocaleString()}</Text>

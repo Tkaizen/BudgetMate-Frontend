@@ -37,6 +37,7 @@ export default function AddExpense() {
     const [category, setCategory] = useState('');
     const [description, setDescription] = useState('');
     const [date, setDate] = useState(new Date());
+    const [mode, setMode] = useState('date');
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
@@ -156,24 +157,42 @@ export default function AddExpense() {
                     {errors.category && <Text style={styles.errorText}>{errors.category}</Text>}
                 </View>
 
-                {/* Date Picker */}
+                {/* Date and Time Pickers */}
                 <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Date</Text>
-                    <TouchableOpacity
-                        style={styles.dateButton}
-                        onPress={() => setShowDatePicker(true)}
-                    >
-                        <MaterialIcons name="calendar-today" size={moderateScale(20)} color={COLORS.textSecondary} />
-                        <Text style={styles.dateText}>
-                            {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </Text>
-                    </TouchableOpacity>
+                    <Text style={styles.label}>Date & Time</Text>
+                    <View style={{ flexDirection: 'row', gap: scale(12) }}>
+                        <TouchableOpacity
+                            style={[styles.dateButton, { flex: 1 }]}
+                            onPress={() => {
+                                setMode('date');
+                                setShowDatePicker(true);
+                            }}
+                        >
+                            <MaterialIcons name="calendar-today" size={moderateScale(20)} color={COLORS.textSecondary} />
+                            <Text style={styles.dateText}>
+                                {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={[styles.dateButton, { flex: 1 }]}
+                            onPress={() => {
+                                setMode('time');
+                                setShowDatePicker(true);
+                            }}
+                        >
+                            <MaterialIcons name="access-time" size={moderateScale(20)} color={COLORS.textSecondary} />
+                            <Text style={styles.dateText}>
+                                {date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
 
                 {showDatePicker && (
                     <DateTimePicker
                         value={date}
-                        mode="date"
+                        mode={mode}
                         display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                         onChange={onDateChange}
                         maximumDate={new Date()}

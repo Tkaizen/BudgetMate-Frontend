@@ -146,6 +146,7 @@ export default function EditBudget() {
                             onChangeText={setSavingsRate}
                         />
                     </View>
+                    <Text style={styles.helperText}>The percentage of your income you want to save each month (Recommended: 20%).</Text>
                 </View>
 
                 {/* Emergency Fund Goal */}
@@ -162,6 +163,7 @@ export default function EditBudget() {
                             onChangeText={setEmergencyGoal}
                         />
                     </View>
+                    <Text style={styles.helperText}>Money set aside for unexpected financial emergencies.</Text>
                 </View>
 
                 {/* Annual Savings Goal */}
@@ -178,6 +180,7 @@ export default function EditBudget() {
                             onChangeText={setAnnualGoal}
                         />
                     </View>
+                    <Text style={styles.helperText}>Your target total savings for the current year.</Text>
                 </View>
 
                 {/* Save Button */}

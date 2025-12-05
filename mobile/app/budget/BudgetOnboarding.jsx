@@ -318,7 +318,7 @@ export default function BudgetOnboarding() {
                 onChangeText={setEmergencyGoal}
               />
             </View>
-            <Text style={styles.helperText}>Typically 3-6 months of expenses</Text>
+            <Text style={styles.helperText}>A safety net for unexpected costs. Aim for 3-6 months of essential expenses.</Text>
 
             <Text style={styles.label}>Annual Savings Goal</Text>
             <View style={styles.inputContainer}>
@@ -332,7 +332,7 @@ export default function BudgetOnboarding() {
                 onChangeText={setAnnualGoal}
               />
             </View>
-            <Text style={styles.helperText}>Your target amount to save in a year</Text>
+            <Text style={styles.helperText}>The total amount you want to save by the end of the year for vacations, gifts, or big purchases.</Text>
           </ScrollView>
 
           <NavigationButtons />

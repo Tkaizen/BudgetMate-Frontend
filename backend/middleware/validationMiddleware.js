@@ -31,9 +31,12 @@ const validateExpense = [
 ];
 
 const validateBudget = [
-    body('amount').isNumeric().withMessage('Amount must be a number'),
-    body('category').not().isEmpty().withMessage('Category is required'),
-    body('period').isIn(['weekly', 'monthly', 'yearly']).withMessage('Period must be weekly, monthly, or yearly'),
+    body('monthlyIncome').optional().isNumeric().withMessage('Monthly Income must be a number'),
+    body('paymentFrequency').optional().not().isEmpty().withMessage('Payment Frequency must be specified'),
+    body('spendingCategories').optional().isArray().withMessage('Spending Categories must be an array'),
+    body('targetSavingsRate').optional().isNumeric().withMessage('Target Savings Rate must be a number'),
+    body('emergencyFundGoal').optional().isNumeric().withMessage('Emergency Fund Goal must be a number'),
+    body('annualSavingsGoal').optional().isNumeric().withMessage('Annual Savings Goal must be a number'),
     validate
 ];
 
