@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Post = require("../models/Post");
 const auth = require("../middleware/authMiddleware");
+const { validatePost } = require("../middleware/validationMiddleware");
 
 // @route   GET /api/posts
 // @desc    Get all posts
@@ -22,7 +23,7 @@ router.get("/", async (req, res) => {
 // @route   POST /api/posts
 // @desc    Create a post
 // @access  Private
-router.post("/", auth, async (req, res) => {
+router.post("/", [auth, validatePost], async (req, res) => {
     try {
         const { title, content, category } = req.body;
 

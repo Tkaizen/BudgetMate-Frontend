@@ -31,11 +31,19 @@ export default function CreatePost() {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [category, setCategory] = useState('');
+    const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async () => {
-        if (!title || !content || !category) {
-            Alert.alert('Error', 'Please fill in all fields');
+        setErrors({});
+        let currentErrors = {};
+
+        if (!title.trim()) currentErrors.title = 'Title is required';
+        if (!category) currentErrors.category = 'Category is required';
+        if (!content.trim()) currentErrors.content = 'Content is required';
+
+        if (Object.keys(currentErrors).length > 0) {
+            setErrors(currentErrors);
             return;
         }
 
@@ -88,13 +96,17 @@ export default function CreatePost() {
                 <View style={styles.inputGroup}>
                     <Text style={styles.label}>Title *</Text>
                     <TextInput
-                        style={styles.titleInput}
+                        style={[styles.titleInput, errors.title && styles.inputError]}
                         placeholder="What's your question or topic?"
                         placeholderTextColor={COLORS.textSecondary}
                         value={title}
-                        onChangeText={setTitle}
+                        onChangeText={(text) => {
+                            setTitle(text);
+                            if (errors.title) setErrors({ ...errors, title: null });
+                        }}
                         maxLength={100}
                     />
+                    {errors.title && <Text style={styles.errorText}>{errors.title}</Text>}
                     <Text style={styles.charCount}>{title.length}/100</Text>
                 </View>
 
@@ -108,8 +120,12 @@ export default function CreatePost() {
                                 style={[
                                     styles.categoryChip,
                                     category === cat && styles.categoryChipActive,
+                                    errors.category && styles.categoryChipError
                                 ]}
-                                onPress={() => setCategory(cat)}
+                                onPress={() => {
+                                    setCategory(cat);
+                                    if (errors.category) setErrors({ ...errors, category: null });
+                                }}
                             >
                                 <Text
                                     style={[
@@ -122,20 +138,25 @@ export default function CreatePost() {
                             </TouchableOpacity>
                         ))}
                     </ScrollView>
+                    {errors.category && <Text style={styles.errorText}>{errors.category}</Text>}
                 </View>
 
                 {/* Content Input */}
                 <View style={styles.inputGroup}>
                     <Text style={styles.label}>Content *</Text>
                     <TextInput
-                        style={styles.contentInput}
+                        style={[styles.contentInput, errors.content && styles.inputError]}
                         placeholder="Share your thoughts, experiences, or ask for advice..."
                         placeholderTextColor={COLORS.textSecondary}
                         multiline
                         value={content}
-                        onChangeText={setContent}
+                        onChangeText={(text) => {
+                            setContent(text);
+                            if (errors.content) setErrors({ ...errors, content: null });
+                        }}
                         maxLength={1000}
                     />
+                    {errors.content && <Text style={styles.errorText}>{errors.content}</Text>}
                     <Text style={styles.charCount}>{content.length}/1000</Text>
                 </View>
 
@@ -271,5 +292,18 @@ const styles = StyleSheet.create({
         fontFamily: 'Poppins-Regular',
         color: COLORS.textSecondary,
         marginBottom: verticalScale(4),
+    },
+    inputError: {
+        borderWidth: 1,
+        borderColor: COLORS.accent,
+    },
+    categoryChipError: {
+        borderColor: COLORS.accent,
+    },
+    errorText: {
+        color: COLORS.accent,
+        fontSize: moderateScale(12),
+        fontFamily: 'Poppins-Regular',
+        marginTop: verticalScale(4),
     },
 });

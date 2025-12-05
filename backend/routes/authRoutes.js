@@ -64,30 +64,30 @@ router.post("/login", async (req, res) => {
         .json({ message: "Email/Username and password are required" });
     }
 
-    // Try to find user by email OR username (name field)
-    const user = await User.findOne({
-      $or: [{ email: email }, { name: email }]
-    });
-    if (!user || !user.password) {
-      return res.status(401).json({ message: "Invalid email/username or password" });
-    }
+// Try to find user by email OR username (name field)
+const user = await User.findOne({
+  $or: [{ email: email }, { name: email }]
+});
+if (!user || !user.password) {
+  return res.status(401).json({ message: "Invalid email/username or password" });
+}
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid email/username or password" });
-    }
+const isMatch = await bcrypt.compare(password, user.password);
+if (!isMatch) {
+  return res.status(401).json({ message: "Invalid email/username or password" });
+}
 
-    const token = createToken(user._id);
+const token = createToken(user._id);
 
-    return res.json({
-      message: "Login successful",
-      user: { id: user._id, name: user.name, email: user.email },
-      token,
-    });
+return res.json({
+  message: "Login successful",
+  user: { id: user._id, name: user.name, email: user.email },
+  token,
+});
   } catch (err) {
-    console.error("Login error:", err);
-    return res.status(500).json({ message: "Server error" });
-  }
+  console.error("Login error:", err);
+  return res.status(500).json({ message: "Server error" });
+}
 });
 
 // 3. Google OAuth Login

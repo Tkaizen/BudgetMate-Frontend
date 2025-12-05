@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Goal = require("../models/Goal");
 const auth = require("../middleware/authMiddleware");
+const { validateGoal } = require("../middleware/validationMiddleware");
 
 // @route   GET /api/goals
 // @desc    Get all goals for logged-in user
@@ -19,7 +20,7 @@ router.get("/", auth, async (req, res) => {
 // @route   POST /api/goals
 // @desc    Create a goal
 // @access  Private
-router.post("/", auth, async (req, res) => {
+router.post("/", [auth, validateGoal], async (req, res) => {
     try {
         const { name, targetAmount, currentAmount, category, targetDate } = req.body;
 
@@ -43,7 +44,7 @@ router.post("/", auth, async (req, res) => {
 // @route   PUT /api/goals/:id
 // @desc    Update goal
 // @access  Private
-router.put("/:id", auth, async (req, res) => {
+router.put("/:id", [auth, validateGoal], async (req, res) => {
     try {
         const { name, targetAmount, currentAmount, category, targetDate } = req.body;
 

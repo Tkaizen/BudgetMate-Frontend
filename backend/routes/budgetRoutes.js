@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const authMiddleware = require('../middleware/authMiddleware');
+const { validateBudget } = require('../middleware/validationMiddleware');
 
 // GET /api/budget - Get current user's budget settings
 router.get('/', authMiddleware, async (req, res) => {
@@ -18,7 +19,7 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 // PUT /api/budget - Update user's budget settings
-router.put('/', authMiddleware, async (req, res) => {
+router.put('/', [authMiddleware, validateBudget], async (req, res) => {
     try {
         const {
             monthlyIncome,

@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Expense = require("../models/Expense");
 const auth = require("../middleware/authMiddleware");
+const { validateExpense } = require("../middleware/validationMiddleware");
 
 // @route   GET /api/expenses
 // @desc    Get all expenses for logged-in user
@@ -19,7 +20,7 @@ router.get("/", auth, async (req, res) => {
 // @route   POST /api/expenses
 // @desc    Add new expense
 // @access  Private
-router.post("/", auth, async (req, res) => {
+router.post("/", [auth, validateExpense], async (req, res) => {
     try {
         const { amount, category, description, date } = req.body;
 
@@ -42,7 +43,7 @@ router.post("/", auth, async (req, res) => {
 // @route   PUT /api/expenses/:id
 // @desc    Update expense
 // @access  Private
-router.put("/:id", auth, async (req, res) => {
+router.put("/:id", [auth, validateExpense], async (req, res) => {
     try {
         const { amount, category, description, date } = req.body;
 

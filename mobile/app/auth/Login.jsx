@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const Login = () => {
   const [username, setUsername] = useState('');   // this is actually email
   const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -17,7 +18,16 @@ const Login = () => {
   const router = useRouter();
 
   const handleLogin = async () => {
-    if (!username || !password) return;
+    setErrors({});
+    let currentErrors = {};
+
+    if (!username) currentErrors.username = "Email or Username is required";
+    if (!password) currentErrors.password = "Password is required";
+
+    if (Object.keys(currentErrors).length > 0) {
+      setErrors(currentErrors);
+      return;
+    }
 
     setLoading(true);
     try {
@@ -91,10 +101,14 @@ const Login = () => {
         <TextInput
           placeholder="Username or Email"
           keyboardType="email-address"
-          style={styles.input}
-          onChangeText={setUsername}
+          style={[styles.input, errors.username && styles.inputError]}
+          onChangeText={(text) => {
+            setUsername(text);
+            if (errors.username) setErrors({ ...errors, username: null });
+          }}
           value={username}
         />
+        {errors.username && <Text style={styles.errorText}>{errors.username}</Text>}
 
         <Text style={styles.label}>Password</Text>
 
@@ -102,8 +116,11 @@ const Login = () => {
           <TextInput
             placeholder="Password"
             secureTextEntry={!showPassword}
-            style={styles.input}
-            onChangeText={setPassword}
+            style={[styles.input, errors.password && styles.inputError]}
+            onChangeText={(text) => {
+              setPassword(text);
+              if (errors.password) setErrors({ ...errors, password: null });
+            }}
             value={password}
           />
 
@@ -118,6 +135,7 @@ const Login = () => {
             />
           </TouchableOpacity>
         </View>
+        {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
 
         <View style={styles.options}>
           <TouchableOpacity
@@ -140,9 +158,9 @@ const Login = () => {
         </View>
 
         <TouchableOpacity
-          style={[styles.button, (!username || !password || loading) && { opacity: 0.5 }]}
+          style={[styles.button, loading && { opacity: 0.5 }]}
           onPress={handleLogin}
-          disabled={!username || !password || loading}
+          disabled={loading}
         >
           <Text style={styles.buttonText}>
             {loading ? "Logging in..." : "Login"}
@@ -337,6 +355,18 @@ const styles = StyleSheet.create({
   signUpLink: {
     color: '#0000EE',
     fontWeight: '600',
+  },
+
+  inputError: {
+    borderColor: 'red',
+    borderWidth: 1,
+  },
+
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginBottom: 10,
+    marginTop: -5,
   },
 });
 

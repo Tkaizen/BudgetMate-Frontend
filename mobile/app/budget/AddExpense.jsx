@@ -38,16 +38,25 @@ export default function AddExpense() {
     const [description, setDescription] = useState('');
     const [date, setDate] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
+    const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async () => {
-        if (!amount || !category) {
-            Alert.alert('Error', 'Please fill in amount and category');
-            return;
+        setErrors({});
+        let currentErrors = {};
+
+        if (!amount) {
+            currentErrors.amount = 'Amount is required';
+        } else if (isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
+            currentErrors.amount = 'Enter a valid amount';
         }
 
-        if (isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
-            Alert.alert('Error', 'Please enter a valid amount');
+        if (!category) {
+            currentErrors.category = 'Category is required';
+        }
+
+        if (Object.keys(currentErrors).length > 0) {
+            setErrors(currentErrors);
             return;
         }
 
@@ -99,7 +108,7 @@ export default function AddExpense() {
                 {/* Amount Input */}
                 <View style={styles.inputGroup}>
                     <Text style={styles.label}>Amount *</Text>
-                    <View style={styles.inputContainer}>
+                    <View style={[styles.inputContainer, errors.amount && styles.inputError]}>
                         <Text style={styles.currencySymbol}>₱</Text>
                         <TextInput
                             style={styles.input}
@@ -107,9 +116,13 @@ export default function AddExpense() {
                             placeholderTextColor={COLORS.textSecondary}
                             keyboardType="decimal-pad"
                             value={amount}
-                            onChangeText={setAmount}
+                            onChangeText={(text) => {
+                                setAmount(text);
+                                if (errors.amount) setErrors({ ...errors, amount: null });
+                            }}
                         />
                     </View>
+                    {errors.amount && <Text style={styles.errorText}>{errors.amount}</Text>}
                 </View>
 
                 {/* Category Selection */}
@@ -122,8 +135,12 @@ export default function AddExpense() {
                                 style={[
                                     styles.categoryChip,
                                     category === cat && styles.categoryChipActive,
+                                    errors.category && styles.categoryChipError
                                 ]}
-                                onPress={() => setCategory(cat)}
+                                onPress={() => {
+                                    setCategory(cat);
+                                    if (errors.category) setErrors({ ...errors, category: null });
+                                }}
                             >
                                 <Text
                                     style={[
@@ -136,6 +153,7 @@ export default function AddExpense() {
                             </TouchableOpacity>
                         ))}
                     </ScrollView>
+                    {errors.category && <Text style={styles.errorText}>{errors.category}</Text>}
                 </View>
 
                 {/* Date Picker */}
@@ -308,5 +326,18 @@ const styles = StyleSheet.create({
         fontSize: moderateScale(16),
         fontFamily: 'Poppins-Bold',
         color: COLORS.text,
+    },
+    inputError: {
+        borderWidth: 1,
+        borderColor: COLORS.accent,
+    },
+    categoryChipError: {
+        borderColor: COLORS.accent,
+    },
+    errorText: {
+        color: COLORS.accent,
+        fontSize: moderateScale(12),
+        fontFamily: 'Poppins-Regular',
+        marginTop: verticalScale(4),
     },
 });

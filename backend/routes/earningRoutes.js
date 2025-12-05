@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Earning = require("../models/Earning");
 const auth = require("../middleware/authMiddleware");
+const { validateEarning } = require("../middleware/validationMiddleware");
 
 // @route   GET /api/earnings
 // @desc    Get all earnings for logged-in user
@@ -19,7 +20,7 @@ router.get("/", auth, async (req, res) => {
 // @route   POST /api/earnings
 // @desc    Add new earning
 // @access  Private
-router.post("/", auth, async (req, res) => {
+router.post("/", [auth, validateEarning], async (req, res) => {
     try {
         const { amount, source, description, date } = req.body;
 
