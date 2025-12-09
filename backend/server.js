@@ -9,6 +9,7 @@ const earningRoutes = require("./routes/earningRoutes");
 const postRoutes = require("./routes/postRoutes");
 const goalRoutes = require("./routes/goalRoutes");
 const budgetRoutes = require("./routes/budgetRoutes");
+const articleRoutes = require("./routes/articleRoutes");
 
 // Load environment variables
 dotenv.config();
@@ -30,6 +31,7 @@ app.use("/api/earnings", earningRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/goals", goalRoutes);
 app.use("/api/budget", budgetRoutes);
+app.use("/api/articles", articleRoutes);
 
 // Simple test route
 app.get("/", (req, res) => {

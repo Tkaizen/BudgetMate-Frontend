@@ -51,7 +51,7 @@ router.post("/signup", async (req, res) => {
 
     return res.status(201).json({
       message: "Signup successful",
-      user: { id: user._id, name: user.name, email: user.email },
+      user: { id: user._id, name: user.name, email: user.email, role: user.role },
       token,
     });
   } catch (err) {
@@ -88,7 +88,7 @@ router.post("/login", async (req, res) => {
 
     return res.json({
       message: "Login successful",
-      user: { id: user._id, name: user.name, email: user.email },
+      user: { id: user._id, name: user.name, email: user.email, role: user.role },
       token,
     });
   } catch (err) {
@@ -150,5 +150,70 @@ router.post("/logout", authMiddleware, (req, res) => {
 router.get("/me", authMiddleware, (req, res) => {
   return res.json({ user: req.user });
 });
+
+// 5. Create Admin User (Development/Admin-only endpoint)
+// This endpoint allows existing admins to create new admin users
+router.post("/admin/create", async (req, res) => {
+  try {
+    const { name, email, password, confirmPassword } = req.body;
+
+    // Validation
+    if (!name || !email || !password || !confirmPassword) {
+      return res.status(400).json({
+        message: "All fields are required (name, email, password, confirmPassword)"
+      });
+    }
+
+    // Email format validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    // Password validation
+    if (password.length < 6) {
+      return res.status(400).json({
+        message: "Password must be at least 6 characters"
+      });
+    }
+
+    // Password match validation
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        message: "Passwords do not match"
+      });
+    }
+
+    // Check if user already exists
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+
+    // Hash password
+    const hash = await bcrypt.hash(password, 10);
+
+    // Create admin user
+    const adminUser = await User.create({
+      name,
+      email,
+      password: hash,
+      role: 'admin', // Set role to admin
+    });
+
+    return res.status(201).json({
+      message: "Admin user created successfully",
+      user: {
+        id: adminUser._id,
+        name: adminUser.name,
+        email: adminUser.email,
+        role: adminUser.role
+      },
+    });
+  } catch (err) {
+    console.error("Admin creation error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
 
 module.exports = router;

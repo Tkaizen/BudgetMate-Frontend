@@ -53,3 +53,53 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// ===== Article API Functions =====
+
+/**
+ * Fetch all published articles
+ * Public endpoint - no authentication required
+ */
+export const fetchArticles = async () => {
+  const response = await api.get("/api/articles");
+  return response.data;
+};
+
+/**
+ * Create a new article (Admin only)
+ * @param {Object} articleData - Article data (title, description, url, etc.)
+ */
+export const createArticle = async (articleData) => {
+  const response = await api.post("/api/articles", articleData);
+  return response.data;
+};
+
+/**
+ * Update an existing article (Admin only)
+ * @param {string} id - Article ID
+ * @param {Object} articleData - Updated article data
+ */
+export const updateArticle = async (id, articleData) => {
+  const response = await api.put(`/api/articles/${id}`, articleData);
+  return response.data;
+};
+
+/**
+ * Delete an article (Admin only)
+ * @param {string} id - Article ID
+ */
+export const deleteArticle = async (id) => {
+  const response = await api.delete(`/api/articles/${id}`);
+  return response.data;
+};
+
+// ===== Admin API Functions =====
+
+/**
+ * Create a new admin user (Admin only)
+ * @param {Object} userData - User data (name, email, password, confirmPassword)
+ */
+export const createAdminUser = async (userData) => {
+  const response = await api.post("/api/auth/admin/create", userData);
+  return response.data;
+};

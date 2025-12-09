@@ -47,13 +47,20 @@ const Login = () => {
       // 3. Success! Save the token and user info
       global.authToken = token;
 
-      // AsyncStorage keeps the user logged in even if they close the app
-      await AsyncStorage.setItem('userData', JSON.stringify({
+      // Store user data including role for admin detection
+      const userData = {
         username: user.username || user.name,
         email: user.email,
         name: user.name || user.username,
-        id: user.id
-      }));
+        id: user.id,
+        role: user.role || 'user' // Include role field
+      };
+
+      // Set global userData for immediate access
+      global.userData = userData;
+
+      // AsyncStorage keeps the user logged in even if they close the app
+      await AsyncStorage.setItem('userData', JSON.stringify(userData));
 
       // 4. Navigate to the Home Screen
       router.replace("/(tabs)/home");
