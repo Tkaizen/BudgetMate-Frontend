@@ -14,6 +14,7 @@ export default {
       supportsTablet: true,
     },
     android: {
+      package: "com.budgetmate.mobile",
       adaptiveIcon: {
         backgroundColor: "#E6F4FE",
         foregroundImage: "./assets/images/android-icon-foreground.png",
@@ -52,6 +53,9 @@ export default {
       IOS_API_URL: process.env.IOS_API_URL,
       ANDROID_API_URL: process.env.ANDROID_API_URL,
       DEFAULT_API_URL: process.env.DEFAULT_API_URL,
+      eas: {
+        projectId: "8f7aa12c-a9b0-49f5-ab23-d2294178159f",
+      },
     },
   },
 };
