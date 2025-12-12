@@ -9,46 +9,10 @@ import { useFocusEffect } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import JobCard from '../../../src/components/JobCard';
 import EarningsChart from '../../../src/components/budget/EarningsChart';
+import AdminJobPanel from '../../../src/components/AdminJobPanel';
+import { fetchJobs } from '../../../src/api/api';
 import { styles, COLORS } from './styles';
 
-const JOBS = [
-    {
-        id: 1,
-        title: 'Freelance Writing',
-        description: 'Write articles for blogs and publications',
-        difficulty: 'Easy',
-        payRange: '₱ 50–200 per article',
-        timeCommitment: '5–10 hrs/week',
-        tags: ['Writing', 'Remote', 'Flexible'],
-        fullDescription: 'Create engaging content for various online platforms. Perfect for those with strong writing skills and creativity. No prior experience required, but a portfolio helps.',
-        requirements: ['Good writing skills', 'Basic grammar knowledge', 'Internet connection'],
-        howToStart: 'Sign up on freelancing platforms like Upwork, Fiverr, or Freelancer.com. Create a compelling profile and start bidding on projects.'
-    },
-    {
-        id: 2,
-        title: 'Virtual Assistant',
-        description: 'Help businesses with administrative tasks',
-        difficulty: 'Easy',
-        payRange: '₱ 15–25/hour',
-        timeCommitment: '10–20 hrs/week',
-        tags: ['Admin', 'Remote', 'Flexible'],
-        fullDescription: 'Provide administrative support to businesses remotely. Tasks include email management, scheduling, data entry, and customer service.',
-        requirements: ['Organizational skills', 'Good communication', 'Computer literacy', 'Reliable internet'],
-        howToStart: 'Create profiles on platforms like Upwork, OnlineJobs.ph, or Virtual Staff Finder. Highlight your organizational and communication skills.'
-    },
-    {
-        id: 3,
-        title: 'Graphic Design',
-        description: 'Create visuals for brands',
-        difficulty: 'Medium',
-        payRange: '₱ 300–1000 per project',
-        timeCommitment: 'Flexible',
-        tags: ['Creative', 'Design', 'Remote'],
-        fullDescription: 'Design logos, social media posts, and marketing materials. Requires knowledge of tools like Canva, Photoshop, or Illustrator.',
-        requirements: ['Design software skills', 'Creativity', 'Portfolio'],
-        howToStart: 'Build a portfolio and showcase your work on Behance or Dribbble. Apply for gigs on freelancing sites.'
-    }
-];
 
 const Earn = () => {
     const [monthlyTotal, setMonthlyTotal] = useState(0);
@@ -58,6 +22,9 @@ const Earn = () => {
     const [selectedJob, setSelectedJob] = useState(null);
     const [jobModalVisible, setJobModalVisible] = useState(false);
     const [seeAllModalVisible, setSeeAllModalVisible] = useState(false);
+    const [user, setUser] = useState(null);
+    const [jobs, setJobs] = useState([]);
+    const [jobsLoading, setJobsLoading] = useState(true);
 
     // Add Earning State
     const [addEarningModalVisible, setAddEarningModalVisible] = useState(false);
@@ -120,9 +87,38 @@ const Earn = () => {
         }
     };
 
+    // Load jobs from API
+    const loadJobs = async () => {
+        setJobsLoading(true);
+        try {
+            const response = await fetchJobs();
+            setJobs(response.jobs || []);
+        } catch (error) {
+            console.error('Error loading jobs:', error);
+            setJobs([]);
+        } finally {
+            setJobsLoading(false);
+        }
+    };
+
+    // Load user data to check if admin
+    const loadUser = async () => {
+        try {
+            const userDataStr = await AsyncStorage.getItem('userData');
+            if (userDataStr) {
+                const userData = JSON.parse(userDataStr);
+                setUser(userData);
+            }
+        } catch (error) {
+            console.error('Error loading user data:', error);
+        }
+    };
+
     useFocusEffect(
         useCallback(() => {
             loadEarnings();
+            loadJobs();
+            loadUser();
         }, [])
     );
 
@@ -167,11 +163,11 @@ const Earn = () => {
     };
 
     // Search Functionality
-    // Filters the JOBS array based on title, description, or tags matching the search query.
-    const filteredJobs = JOBS.filter(job =>
+    // Filters the jobs array based on title, description, or tags matching the search query.
+    const filteredJobs = jobs.filter(job =>
         job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         job.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+        (job.tags && job.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())))
     );
 
     const handleLearnMore = (job) => {
@@ -266,7 +262,7 @@ const Earn = () => {
                         <ScrollView showsVerticalScrollIndicator={false}>
                             {filteredJobs.map((job) => (
                                 <JobCard
-                                    key={job.id}
+                                    key={job._id || job.id}
                                     job={job}
                                     onPress={(j) => {
                                         setSeeAllModalVisible(false);
@@ -346,6 +342,11 @@ const Earn = () => {
                     )}
                 </View>
 
+                {/* Admin Panel - Only visible to admins */}
+                {user && user.role === 'admin' && (
+                    <AdminJobPanel jobs={jobs} onRefresh={loadJobs} />
+                )}
+
                 {/* Jobs Section */}
                 <View style={styles.sectionHeader}>
                     <Text style={styles.sectionTitle}>Available Jobs</Text>
@@ -359,9 +360,13 @@ const Earn = () => {
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={styles.jobsScroll}
                 >
-                    {filteredJobs.length > 0 ? (
+                    {jobsLoading ? (
+                        <View style={styles.emptySearch}>
+                            <Text style={styles.emptySearchText}>Loading jobs...</Text>
+                        </View>
+                    ) : filteredJobs.length > 0 ? (
                         filteredJobs.map((job) => (
-                            <JobCard key={job.id} job={job} onPress={handleLearnMore} />
+                            <JobCard key={job._id || job.id} job={job} onPress={handleLearnMore} />
                         ))
                     ) : (
                         <View style={styles.emptySearch}>

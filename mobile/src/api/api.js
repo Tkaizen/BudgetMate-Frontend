@@ -103,3 +103,42 @@ export const createAdminUser = async (userData) => {
   const response = await api.post("/api/auth/admin/create", userData);
   return response.data;
 };
+
+// ===== Job API Functions =====
+
+/**
+ * Fetch all published jobs
+ * Public endpoint - no authentication required
+ */
+export const fetchJobs = async () => {
+  const response = await api.get("/api/jobs");
+  return response.data;
+};
+
+/**
+ * Create a new job (Admin only)
+ * @param {Object} jobData - Job data (title, description, payRange, etc.)
+ */
+export const createJob = async (jobData) => {
+  const response = await api.post("/api/jobs", jobData);
+  return response.data;
+};
+
+/**
+ * Update an existing job (Admin only)
+ * @param {string} id - Job ID
+ * @param {Object} jobData - Updated job data
+ */
+export const updateJob = async (id, jobData) => {
+  const response = await api.put(`/api/jobs/${id}`, jobData);
+  return response.data;
+};
+
+/**
+ * Delete a job (Admin only)
+ * @param {string} id - Job ID
+ */
+export const deleteJob = async (id) => {
+  const response = await api.delete(`/api/jobs/${id}`);
+  return response.data;
+};
